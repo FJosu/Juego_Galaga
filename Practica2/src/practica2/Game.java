@@ -1,16 +1,17 @@
 package practica2;
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 public class Game extends JPanel implements ActionListener {
     private Timer timer;
     private Player player;
-    private List<Enemy> enemies;
     private List<Bullet> bullets;
     private List<Items> items; // Lista de ítems
     private JLayeredPane panel;
@@ -20,22 +21,25 @@ public class Game extends JPanel implements ActionListener {
     private Timer gameTimer;
     private int timeRemaining;
     private JLabel timeLabel;
+    private JLabel pointsLabel; // Etiqueta para mostrar los puntos del jugador
+    private long lastShootTime=0;
+    private final long shootCooldown = 300;
 
     public Game() {
         setFocusable(true);
         setPreferredSize(new Dimension(800, 600));
         setBackground(Color.BLACK);
         player = new Player(50, 300); // Ajuste para posicionar al jugador correctamente
-        enemies = new ArrayList<>();
+
         bullets = new ArrayList<>();
         items = new ArrayList<>(); // Inicializar lista de ítems
         panel = new JLayeredPane();
         panel.setPreferredSize(new Dimension(800, 600));
         panel.setBackground(Color.BLACK);
-    
+
         // Agregar el JLayeredPane al JFrame o contenedor principal
         add(panel);
-        
+
         enemigosThread = new Enemies(panel);
         enemigosThread.start();
 
@@ -48,16 +52,33 @@ public class Game extends JPanel implements ActionListener {
 
         // Inicializar el temporizador del juego con 90 segundos
         timeRemaining = 90;
-        timeLabel = new JLabel("Tiempo restante: " + timeRemaining + "s");
+        timeLabel = new JLabel("Time: " + timeRemaining + "s");
         timeLabel.setForeground(Color.WHITE);
+        timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 30));
+        timeLabel.setBounds(70, 10, 200, 30);
         panel.add(timeLabel);
-        timeLabel.setBounds(10, 10, 200, 30);
+        
+
+        ImageIcon clockIcon = new ImageIcon(getClass().getResource("/img/cronometro.png"));
+        Image clockImage = clockIcon.getImage().getScaledInstance(40, 60, Image.SCALE_SMOOTH);
+        clockIcon = new ImageIcon(clockImage);
+        JLabel clockLabel = new JLabel(clockIcon);
+        clockLabel.setBounds(40, -5, clockIcon.getIconWidth(), clockIcon.getIconHeight());
+        panel.add(clockLabel);
+
+        // Inicializar la etiqueta de puntos del jugador
+        pointsLabel = new JLabel("Sccore: 0");
+        pointsLabel.setForeground(Color.WHITE);
+        pointsLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 25));
+        panel.add(pointsLabel);
+        pointsLabel.setBounds(600, 10, 300, 25);
 
         gameTimer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 timeRemaining--;
-                timeLabel.setText("Tiempo restante: " + timeRemaining + "s");
+                timeLabel.setText("Time: " + timeRemaining + "s");
+                timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 25));
                 if (timeRemaining <= 0) {
                     gameTimer.stop();
                     timer.stop();
@@ -68,14 +89,19 @@ public class Game extends JPanel implements ActionListener {
         gameTimer.start();
 
         addKeyListener(new KeyAdapter() {
+            
             @Override
             public void keyPressed(KeyEvent e) {
+                long currentTIme= System.currentTimeMillis();
                 player.keyPressed(e);
+                if(currentTIme-lastShootTime >= shootCooldown){ 
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     bullets.add(new Bullet(player.getX() + 20, player.getY() + 7));
                     musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\Practica2\\src\\img\\Shoot.wav");
+                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                    lastShootTime=currentTIme;
                 }
+            }
             }
 
             @Override
@@ -114,29 +140,30 @@ public class Game extends JPanel implements ActionListener {
         List<Bullet> bulletsToRemove = new ArrayList<>();
         List<JLabel> enemiesToRemove = new ArrayList<>();
         List<Items> itemsToRemove = new ArrayList<>(); // Lista para ítems a eliminar
-    
+
         Rectangle playerBounds = new Rectangle(player.getX(), player.getY(), 50, 50); // Rectángulo del jugador
-    
+
         Iterator<Bullet> bulletIterator = bullets.iterator();
         while (bulletIterator.hasNext()) {
             Bullet bullet = bulletIterator.next();
             Rectangle bulletBounds = bullet.getBounds();
-    
+
             Iterator<JLabel> enemyIterator = enemigosThread.getEnemies().iterator();
             while (enemyIterator.hasNext()) {
                 JLabel enemyLabel = enemyIterator.next();
                 if (bulletBounds.intersects(enemyLabel.getBounds())) {
                     bulletsToRemove.add(bullet);
                     enemiesToRemove.add(enemyLabel);
+                    showExplosion(enemyLabel.getX(), enemyLabel.getY());
                     panel.remove(enemyLabel);
                     System.out.println("Enemy hit!");
                     musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\Practica2\\src\\img\\explosion.wav");
+                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\explosion.wav");
                     break;
                 }
             }
         }
-    
+
         // Detectar colisiones con el jugador y los ítems
         for (Items item : items) {
             if (playerBounds.intersects(item.getBounds())) {
@@ -149,16 +176,16 @@ public class Game extends JPanel implements ActionListener {
                 }else if(item.getType().equals("-points")){
                     player.addPoints(-10);
                 }else if(item.getType().equals("-time")){
-
                     addTime(-10);
                 }
+                updatePointsLabel(); // Actualizar la etiqueta de puntos
             }
         }
-    
+
         bullets.removeAll(bulletsToRemove);
         enemigosThread.getEnemies().removeAll(enemiesToRemove);
         items.removeAll(itemsToRemove);
-    
+
         if (enemigosThread.getEnemies().isEmpty()) {
             JOptionPane.showMessageDialog(this, "¡Has ganado!", "Juego terminado", JOptionPane.INFORMATION_MESSAGE);
             timer.stop();
@@ -185,7 +212,30 @@ public class Game extends JPanel implements ActionListener {
 
     private void addTime(int seconds) {
         timeRemaining += seconds;
-        timeLabel.setText("Tiempo restante: " + timeRemaining + "s");
+        timeLabel.setText("Time: " + timeRemaining + "s");
+        timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 30));
+    }
+
+    private void updatePointsLabel() {
+        pointsLabel.setText("Score: " + player.getPoints());
+        pointsLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 30));
+    }
+
+    private void showExplosion(int x, int y) {
+        ImageIcon explosionIcon = new ImageIcon(getClass().getResource("/img/explosion13.png"));
+        JLabel explosionLabel = new JLabel(explosionIcon);
+        explosionLabel.setBounds(x, y, explosionIcon.getIconWidth(), explosionIcon.getIconHeight());
+        panel.add(explosionLabel, JLayeredPane.PALETTE_LAYER);
+
+        Timer explosionTimer = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.remove(explosionLabel);
+                panel.repaint();
+            }
+        });
+        explosionTimer.setRepeats(false);
+        explosionTimer.start();
     }
 
     class Enemies extends Thread {
@@ -203,7 +253,7 @@ public class Game extends JPanel implements ActionListener {
         private void createEnemies() {
             int horizontalSpacing = 62; // Ajusta este valor para aumentar el espacio horizontal
             int verticalSpacing = 60;   // Ajusta este valor para aumentar el espacio vertical
-            
+
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 5; j++) {
                     ImageIcon enemigoIcon;
@@ -217,7 +267,7 @@ public class Game extends JPanel implements ActionListener {
 
                     Image enemyImage = enemigoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH); // Aumentar tamaño de los enemigos
                     enemigoIcon = new ImageIcon(enemyImage);
-                    
+
                     JLabel enemy = new JLabel(enemigoIcon);
                     enemy.setBounds(700 + j * horizontalSpacing, 50 + i * verticalSpacing, 40, 40); // Ajustar la posición y tamaño de los enemigos
                     enemies.add(enemy);
@@ -235,7 +285,7 @@ public class Game extends JPanel implements ActionListener {
                 if (enemyLabel.getY() >= panel.getHeight() - 65 || enemyLabel.getY() <= 0) {
                     dy = -dy;  // Cambiar de dirección
                     for (JLabel en : enemies) {
-                        en.setLocation(en.getX() - 40, en.getY());  // Mover los enemigos a la izquierda
+                        en.setLocation(en.getX() - 20, en.getY());  // Mover los enemigos a la izquierda
                     }
                     break;
                 }
@@ -255,4 +305,19 @@ public class Game extends JPanel implements ActionListener {
             }
         }
     }
+        // Método para realizar el disparo
+        private void shoot() {
+            long currentTime = System.currentTimeMillis();
+            // Verificar si ha pasado suficiente tiempo desde el último disparo
+            if (currentTime - lastShootTime >= shootCooldown) {
+                bullets.add(new Bullet(player.getX() + 20, player.getY() + 7));
+                musicPlayer2 = new MusicPlayer2();
+                musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+    
+                // Actualizar el tiempo del último disparo
+                lastShootTime = currentTime;
+            }
+        }
 }
+
+
