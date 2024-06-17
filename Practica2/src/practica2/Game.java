@@ -19,6 +19,7 @@ public class Game extends JPanel implements ActionListener {
     private ImageIcon backgroundImage;
     private MusicPlayer2 musicPlayer2;
     private Timer gameTimer;
+    private Timer itemTimer;
     private int timeRemaining;
     private JLabel timeLabel;
     private JLabel pointsLabel; // Etiqueta para mostrar los puntos del jugador
@@ -87,6 +88,14 @@ public class Game extends JPanel implements ActionListener {
             }
         });
         gameTimer.start();
+
+        itemTimer = new Timer(3000,new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                generateRandomItems();
+            }
+        });
+        itemTimer.start();
 
         addKeyListener(new KeyAdapter() {
             
@@ -195,19 +204,17 @@ public class Game extends JPanel implements ActionListener {
 
     private void generateRandomItems() {
         Random rand = new Random();
-        for (int i = 0; i < 4; i++) {
-            String type;
-            if (rand.nextBoolean()) {
-                type = "points";
-            } else {
-                type = rand.nextBoolean() ? "penalization" : rand.nextBoolean() ? "-points" : "-time";
-            }
-            int x = 800; // Los ítems comenzarán en la posición x = 0
-            int y = rand.nextInt(550);
-            Items item = new Items(type, x, y);
-            items.add(item);
-            panel.add(item.getItemLabel());
+        String type;
+        if (rand.nextBoolean()) {
+            type = "points";
+        } else {
+            type = rand.nextBoolean() ? "penalization" : rand.nextBoolean() ? "-points" : "-time";
         }
+        int x = 800; // Los ítems comenzarán en la posición x = 0
+        int y = rand.nextInt(550);
+        Items item = new Items(type, x, y);
+        items.add(item);
+        panel.add(item.getItemLabel());
     }
 
     private void addTime(int seconds) {
@@ -253,16 +260,25 @@ public class Game extends JPanel implements ActionListener {
         private void createEnemies() {
             int horizontalSpacing = 62; // Ajusta este valor para aumentar el espacio horizontal
             int verticalSpacing = 60;   // Ajusta este valor para aumentar el espacio vertical
+            int life;
+            int points;
 
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 5; j++) {
                     ImageIcon enemigoIcon;
                     if (j == 0) {
                         enemigoIcon = new ImageIcon(getClass().getResource("/img/row1.png"));
+                        life = 2;
+                        points = 10;
+
                     } else if (j == 1 || j == 2) {
                         enemigoIcon = new ImageIcon(getClass().getResource("/img/row34.png"));
+                        life = 3;
+                        points = 20;
                     } else {
                         enemigoIcon = new ImageIcon(getClass().getResource("/img/row45.png"));
+                        life = 4;
+                        points = 30;
                     }
 
                     Image enemyImage = enemigoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH); // Aumentar tamaño de los enemigos
@@ -305,19 +321,6 @@ public class Game extends JPanel implements ActionListener {
             }
         }
     }
-        // Método para realizar el disparo
-        private void shoot() {
-            long currentTime = System.currentTimeMillis();
-            // Verificar si ha pasado suficiente tiempo desde el último disparo
-            if (currentTime - lastShootTime >= shootCooldown) {
-                bullets.add(new Bullet(player.getX() + 20, player.getY() + 7));
-                musicPlayer2 = new MusicPlayer2();
-                musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
-    
-                // Actualizar el tiempo del último disparo
-                lastShootTime = currentTime;
-            }
-        }
 }
 
 
