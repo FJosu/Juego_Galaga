@@ -1,89 +1,128 @@
 package practica2;
-
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LeaderboardWindow extends JFrame {
     private ScoreManager scoreManager;
+    private MusicPlayer musicPlayer;
 
     public LeaderboardWindow(ScoreManager scoreManager) {
         this.scoreManager = scoreManager;
-        setTitle("Top 5 Scores");
-        setSize(600, 400);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
 
-        // Crear el panel principal con fondo de espacio
-        JPanel mainPanel = new BackgroundPanel(new ImageIcon("path_to_space_background.jpg").getImage());
-        mainPanel.setLayout(new GridBagLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        musicPlayer = new MusicPlayer();
+        musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\song16.wav");
+       
+        ImageIcon Top5 = new ImageIcon(getClass().getResource("/img/TOP5.png"));
+        Image top5dime = Top5.getImage().getScaledInstance(600, 300,Image.SCALE_SMOOTH);
+        ImageIcon finaltop5 = new ImageIcon(top5dime);
+        JLabel toplabel = new JLabel(finaltop5);
+        toplabel.setBounds(-140, -100, Top5.getIconWidth(), Top5.getIconHeight());
+        add(toplabel);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        JLabel titleLabel = new JLabel("Top 5 Scores");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
-        titleLabel.setForeground(Color.WHITE);
-        mainPanel.add(titleLabel, gbc);
-
+       
+        // Obtener los puntajes principales
         List<Score> topScores = scoreManager.getTopScores(5);
-        JPanel podiumPanel = new JPanel();
-        podiumPanel.setLayout(new GridBagLayout());
-        podiumPanel.setOpaque(false);
 
-        // Agregar posiciones al podio
-        for (int i = 0; i < 3; i++) {
-            gbc.gridx = i;
-            gbc.gridy = 1;
-            gbc.gridwidth = 1;
-            gbc.gridheight = 2 - i;
-            String positionText = String.format("%d. %s: %d", i + 1, topScores.get(i).getName(), topScores.get(i).getScore());
-            JLabel positionLabel = new JLabel(positionText);
-            positionLabel.setFont(new Font("Arial", Font.BOLD, 20));
-            positionLabel.setForeground(Color.WHITE);
-            positionLabel.setVerticalAlignment(SwingConstants.BOTTOM);
-            podiumPanel.add(positionLabel, gbc);
-        }
+        // Agregar los nombres y puntuaciones en el podio
+        JLabel firstPlaceLabel = new JLabel(formatScore(topScores.get(0)));
+        firstPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
+        firstPlaceLabel.setForeground(Color.WHITE);
+        firstPlaceLabel.setBounds(165, 360, 200, 50); // Ajusta las coordenadas según sea necesario
+        add(firstPlaceLabel);
+
+        JLabel secondPlaceLabel = new JLabel(formatScore(topScores.get(1)));
+        secondPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
+        secondPlaceLabel.setForeground(Color.WHITE);
+        secondPlaceLabel.setBounds(10, 390, 200, 50); // Ajusta las coordenadas según sea necesario
+        add(secondPlaceLabel);
+
+        JLabel thirdPlaceLabel = new JLabel(formatScore(topScores.get(2)));
+        thirdPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
+        thirdPlaceLabel.setForeground(Color.WHITE);
+        thirdPlaceLabel.setBounds(260, 400, 200, 50); // Ajusta las coordenadas según sea necesario
+        add(thirdPlaceLabel);
 
         // Agregar los lugares 4 y 5 abajo del podio
-        for (int i = 3; i < 5; i++) {
-            gbc.gridx = i - 3;
-            gbc.gridy = 3;
-            gbc.gridwidth = 3;
-            gbc.gridheight = 1;
-            String positionText = String.format("%d. %s: %d", i + 1, topScores.get(i).getName(), topScores.get(i).getScore());
-            JLabel positionLabel = new JLabel(positionText);
-            positionLabel.setFont(new Font("Arial", Font.BOLD, 20));
-            positionLabel.setForeground(Color.WHITE);
-            mainPanel.add(positionLabel, gbc);
-        }
+        JLabel fourthPlaceLabel = new JLabel("4. "+formatScore(topScores.get(3)));
+        fourthPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
+        fourthPlaceLabel.setForeground(Color.WHITE);
+        fourthPlaceLabel.setBounds(50, 525, 400, 50); // Ajusta las coordenadas según sea necesario
+        add(fourthPlaceLabel);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 3;
-        mainPanel.add(podiumPanel, gbc);
+        JLabel fifthPlaceLabel = new JLabel("5. "+formatScore(topScores.get(4)));
+        fifthPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
+        fifthPlaceLabel.setForeground(Color.WHITE);
+        fifthPlaceLabel.setBounds(50, 550, 400, 50); // Ajusta las coordenadas según sea necesario
+        add(fifthPlaceLabel);
 
-        add(mainPanel);
+         // Cargar la imagen del podio
+         ImageIcon podiumImage = new ImageIcon(getClass().getResource("/img/podium.png"));
+         Image imagedimension = podiumImage.getImage().getScaledInstance(400, 400,Image.SCALE_SMOOTH);
+         ImageIcon finalimage = new ImageIcon(imagedimension);
+         JLabel podiumLabel = new JLabel(finalimage);
+         podiumLabel.setBounds(-65, 100, podiumImage.getIconWidth(), podiumImage.getIconHeight());
+         add(podiumLabel);
+
+         JButton back = new JButton("Back");
+            back.setBounds(300, 10, 75, 50);
+            back.setContentAreaFilled(false);
+            back.setFocusPainted(false);
+            back.setBorder(BorderFactory.createEmptyBorder());
+            back.setForeground(Color.WHITE);
+            back.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 30));
+            back.addActionListener(e -> {
+                dispose();
+                Inicial inicial = new Inicial();
+                musicPlayer.stopMusic();
+            });
+            add(back);
+ 
+
+    
+        // Configurar el JFrame
+        setTitle("Score");
+        setSize(400, 700);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+        setUndecorated(true);
+
+        // Cargar y redimensionar el GIF
+        ImageIcon gif = new ImageIcon(getClass().getResource("/img/space.gif"));
+        ImageIcon scaledGif = new ImageIcon(scaleGif(gif, getWidth(), getHeight()));
+
+        // Crear un JLabel con el GIF redimensionado
+        JLabel gifLabel = new JLabel(scaledGif);
+
+        // Añadir el JLabel al JFrame
+        add(gifLabel, BorderLayout.CENTER);
+
+        // Hacer visible la ventana
+        setVisible(true);
     }
 
-    // Panel con imagen de fondo
-    class BackgroundPanel extends JPanel {
-        private Image backgroundImage;
-
-        public BackgroundPanel(Image backgroundImage) {
-            this.backgroundImage = backgroundImage;
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-        }
+    private String formatScore(Score score) {
+        return String.format("%s: %d", score.getName(), score.getScore());
     }
+ // Método para redimensionar el GIF
+    private Image scaleGif(ImageIcon gif, int width, int height) {
+        List<Image> frames = new ArrayList<>();
+        int frameCount = gif.getIconHeight() / gif.getIconWidth();
+        for (int i = 0; i < frameCount; i++) {
+            Image frame = gif.getImage();
+            frames.add(frame.getScaledInstance(width, height, Image.SCALE_DEFAULT));
+        }
+        return new ImageIcon(frames.get(0)).getImage();
+    }
+    
 }
+
+
+
+
+
+
 

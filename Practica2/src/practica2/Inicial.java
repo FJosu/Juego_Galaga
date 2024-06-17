@@ -23,7 +23,7 @@ public class Inicial extends JFrame {
         newgame.setFocusPainted(false);
         newgame.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         newgame.setForeground(Color.WHITE);
-        newgame.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 20));
+        newgame.setFont(new Font("c", Font.BOLD, 20));
         newgame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -73,6 +73,7 @@ public class Inicial extends JFrame {
                 musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
                 musicPlayer.stopMusic();
                 showLeaderboard();
+                dispose();
             }
         
         });
