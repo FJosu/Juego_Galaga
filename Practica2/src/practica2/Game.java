@@ -2,6 +2,9 @@ package practica2;
 
 
 import javax.swing.*;
+
+import practica2.Game.Enemies;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -25,8 +28,13 @@ public class Game extends JPanel implements ActionListener {
     private JLabel pointsLabel; // Etiqueta para mostrar los puntos del jugador
     private long lastShootTime=0;
     private final long shootCooldown = 300;
+    private JFrame mainFrame;
+    private MusicPlayer musicPlayer;
 
-    public Game() {
+    public Game(JFrame frame) {
+        musicPlayer = new MusicPlayer();
+        musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\song04.wav");
+        this.mainFrame = frame;
         setFocusable(true);
         setPreferredSize(new Dimension(800, 600));
         setBackground(Color.BLACK);
@@ -44,8 +52,8 @@ public class Game extends JPanel implements ActionListener {
         enemigosThread = new Enemies(panel);
         enemigosThread.start();
 
-        for (JLabel enemyLabel : enemigosThread.getEnemies()) {
-            panel.add(enemyLabel);
+        for (Game.Enemy enemy : enemigosThread.getEnemies()) {
+            panel.add(enemy.getEnemyLabel());
         }
 
         timer = new Timer(10, this);
@@ -98,26 +106,33 @@ public class Game extends JPanel implements ActionListener {
         itemTimer.start();
 
         addKeyListener(new KeyAdapter() {
-            
-            @Override
-            public void keyPressed(KeyEvent e) {
-                long currentTIme= System.currentTimeMillis();
-                player.keyPressed(e);
-                if(currentTIme-lastShootTime >= shootCooldown){ 
-                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    bullets.add(new Bullet(player.getX() + 20, player.getY() + 7));
-                    musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
-                    lastShootTime=currentTIme;
-                }
+    @Override
+    public void keyPressed(KeyEvent e) {
+        long currentTIme = System.currentTimeMillis();
+        player.keyPressed(e);
+        if (currentTIme - lastShootTime >= shootCooldown) {
+            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                bullets.add(new Bullet(player.getX() + 20, player.getY() + 7));
+                musicPlayer2 = new MusicPlayer2();
+                musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                lastShootTime = currentTIme;
             }
-            }
+        }
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                player.keyReleased(e);
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            int response = JOptionPane.showConfirmDialog(panel, "¿Deseas salir y reiniciar el juego?", "Confirmar salida", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.YES_OPTION) {
+                closeAndOpenInitial();
+                
             }
-        });
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        player.keyReleased(e);
+    }
+});
 
         generateRandomItems();
     }
@@ -147,32 +162,34 @@ public class Game extends JPanel implements ActionListener {
 
     private void checkCollisions() {
         List<Bullet> bulletsToRemove = new ArrayList<>();
-        List<JLabel> enemiesToRemove = new ArrayList<>();
+        List<Enemy> enemiesToRemove = new ArrayList<>();
         List<Items> itemsToRemove = new ArrayList<>(); // Lista para ítems a eliminar
-
+    
         Rectangle playerBounds = new Rectangle(player.getX(), player.getY(), 50, 50); // Rectángulo del jugador
-
-        Iterator<Bullet> bulletIterator = bullets.iterator();
-        while (bulletIterator.hasNext()) {
-            Bullet bullet = bulletIterator.next();
+    
+        for (Bullet bullet : bullets) {
             Rectangle bulletBounds = bullet.getBounds();
-
-            Iterator<JLabel> enemyIterator = enemigosThread.getEnemies().iterator();
-            while (enemyIterator.hasNext()) {
-                JLabel enemyLabel = enemyIterator.next();
+    
+            for (Enemy enemy : enemigosThread.getEnemies()) {
+                JLabel enemyLabel = enemy.getEnemyLabel();
                 if (bulletBounds.intersects(enemyLabel.getBounds())) {
                     bulletsToRemove.add(bullet);
-                    enemiesToRemove.add(enemyLabel);
-                    showExplosion(enemyLabel.getX(), enemyLabel.getY());
-                    panel.remove(enemyLabel);
-                    System.out.println("Enemy hit!");
-                    musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\explosion.wav");
+                    enemy.takeDamage(1); // Reducir la vida del enemigo
+                    if (enemy.getLives() <= 0) {
+                        enemiesToRemove.add(enemy);
+                        showExplosion(enemyLabel.getX(), enemyLabel.getY());
+                        panel.remove(enemyLabel);
+                        player.addPoints(enemy.getPoints()); // Añadir puntos al jugador
+                        updatePointsLabel(); // Actualizar la etiqueta de puntos
+                        System.out.println("Enemy destroyed!");
+                        musicPlayer2 = new MusicPlayer2();
+                        musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\explosion.wav");
+                    }
                     break;
                 }
             }
         }
-
+    
         // Detectar colisiones con el jugador y los ítems
         for (Items item : items) {
             if (playerBounds.intersects(item.getBounds())) {
@@ -182,25 +199,39 @@ public class Game extends JPanel implements ActionListener {
                     player.addPoints(10); // Añadir puntos al jugador
                 } else if (item.getType().equals("penalization")) {
                     addTime(10); // Añadir 5 segundos al temporizador del juego
-                }else if(item.getType().equals("-points")){
+                } else if (item.getType().equals("-points")) {
                     player.addPoints(-10);
-                }else if(item.getType().equals("-time")){
+                } else if (item.getType().equals("-time")) {
                     addTime(-10);
                 }
                 updatePointsLabel(); // Actualizar la etiqueta de puntos
             }
         }
-
+    
         bullets.removeAll(bulletsToRemove);
         enemigosThread.getEnemies().removeAll(enemiesToRemove);
         items.removeAll(itemsToRemove);
-
+    
+        // Comprobar si algún enemigo toca al jugador o llega al límite izquierdo
+        for (Enemy enemy : enemigosThread.getEnemies()) {
+            JLabel enemyLabel = enemy.getEnemyLabel();
+            if (playerBounds.intersects(enemyLabel.getBounds()) || enemyLabel.getX() <= 0) {
+                timer.stop();
+                gameTimer.stop();
+                enemigosThread.stopRunning();
+                // Mostrar mensaje de "Game Over"
+                showEndGameDialog("¡Game Over!");
+                return; // Salir del método después de detectar el Game Over
+            }
+        }
+    
         if (enemigosThread.getEnemies().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "¡Has ganado!", "Juego terminado", JOptionPane.INFORMATION_MESSAGE);
+            showEndGameDialog("¡Has ganado!");
             timer.stop();
             gameTimer.stop();
         }
     }
+    
 
     private void generateRandomItems() {
         Random rand = new Random();
@@ -246,81 +277,154 @@ public class Game extends JPanel implements ActionListener {
     }
 
     class Enemies extends Thread {
-        private ArrayList<JLabel> enemies;
-        private JLayeredPane panel;
-        private int dy = 2;  // Velocidad vertical
-        private boolean movingDown = true;  // Indica si los enemigos se están moviendo hacia abajo
+    private ArrayList<Enemy> enemies;
+    private JLayeredPane panel;
+    private int dy = 8;  // Velocidad vertical
+    private boolean running = true; // Añadido
 
-        public Enemies(JLayeredPane panel) {
-            this.panel = panel;
-            enemies = new ArrayList<>();
-            createEnemies();
-        }
+    public Enemies(JLayeredPane panel) {
+        this.panel = panel;
+        enemies = new ArrayList<>();
+        createEnemies();
+    }
 
-        private void createEnemies() {
-            int horizontalSpacing = 62; // Ajusta este valor para aumentar el espacio horizontal
-            int verticalSpacing = 60;   // Ajusta este valor para aumentar el espacio vertical
-            int life;
-            int points;
+    private void createEnemies() {
+        int horizontalSpacing = 62; // Ajusta este valor para aumentar el espacio horizontal
+        int verticalSpacing = 60;   // Ajusta este valor para aumentar el espacio vertical
+        int life;
+        int points;
 
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 5; j++) {
-                    ImageIcon enemigoIcon;
-                    if (j == 0) {
-                        enemigoIcon = new ImageIcon(getClass().getResource("/img/row1.png"));
-                        life = 2;
-                        points = 10;
-
-                    } else if (j == 1 || j == 2) {
-                        enemigoIcon = new ImageIcon(getClass().getResource("/img/row34.png"));
-                        life = 3;
-                        points = 20;
-                    } else {
-                        enemigoIcon = new ImageIcon(getClass().getResource("/img/row45.png"));
-                        life = 4;
-                        points = 30;
-                    }
-
-                    Image enemyImage = enemigoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH); // Aumentar tamaño de los enemigos
-                    enemigoIcon = new ImageIcon(enemyImage);
-
-                    JLabel enemy = new JLabel(enemigoIcon);
-                    enemy.setBounds(700 + j * horizontalSpacing, 50 + i * verticalSpacing, 40, 40); // Ajustar la posición y tamaño de los enemigos
-                    enemies.add(enemy);
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 5; j++) {
+                ImageIcon enemigoIcon;
+                if (j == 0) {
+                    enemigoIcon = new ImageIcon(getClass().getResource("/img/row1.png"));
+                    life = 2;
+                    points = 10;
+                } else if (j == 1 || j == 2) {
+                    enemigoIcon = new ImageIcon(getClass().getResource("/img/row34.png"));
+                    life = 3;
+                    points = 20;
+                } else {
+                    enemigoIcon = new ImageIcon(getClass().getResource("/img/row45.png"));
+                    life = 4;
+                    points = 30;
                 }
-            }
-        }
 
-        public ArrayList<JLabel> getEnemies() {
-            return enemies;
-        }
+                Image enemyImage = enemigoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH); // Aumentar tamaño de los enemigos
+                enemigoIcon = new ImageIcon(enemyImage);
 
-        public void moveEnemies() {
-            for (JLabel enemyLabel : enemies) {
-                enemyLabel.setLocation(enemyLabel.getX(), enemyLabel.getY() + dy);
-                if (enemyLabel.getY() >= panel.getHeight() - 65 || enemyLabel.getY() <= 0) {
-                    dy = -dy;  // Cambiar de dirección
-                    for (JLabel en : enemies) {
-                        en.setLocation(en.getX() - 20, en.getY());  // Mover los enemigos a la izquierda
-                    }
-                    break;
-                }
-            }
-        }
+                JLabel enemyLabel = new JLabel(enemigoIcon);
+                enemyLabel.setBounds(700 + j * horizontalSpacing, 50 + i * verticalSpacing, 40, 40); // Ajustar la posición y tamaño de los enemigos
 
-        @Override
-        public void run() {
-            while (true) {
-                moveEnemies();
-                panel.repaint();
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                enemies.add(new Enemy(enemyLabel, life, points));
             }
         }
     }
+
+    public ArrayList<Enemy> getEnemies() {
+        return enemies;
+    }
+
+    public void moveEnemies() {
+        for (Enemy enemy : enemies) {
+            JLabel enemyLabel = enemy.getEnemyLabel();
+            enemyLabel.setLocation(enemyLabel.getX(), enemyLabel.getY() + dy);
+            if (enemyLabel.getY() >= panel.getHeight() - 65 || enemyLabel.getY() <= 0) {
+                dy = -dy;  // Cambiar de dirección
+                for (Enemy en : enemies) {
+                    en.getEnemyLabel().setLocation(en.getEnemyLabel().getX() - 20, en.getEnemyLabel().getY());  // Mover los enemigos a la izquierda
+                }
+                break;
+            }
+        }
+    }
+
+    public void stopRunning() { // Añadido
+        running = false;
+    }
+
+    @Override
+    public void run() {
+        while (running) { // Cambiado
+            moveEnemies();
+            panel.repaint();
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                running = false; // Añadido: salir del ciclo cuando se interrumpe el sueño
+            }
+        }
+    }
+}
+
+    
+    class Enemy {
+        private JLabel enemyLabel;
+        private int lives;
+        private int points;
+    
+        public Enemy(JLabel enemyLabel, int lives, int points) {
+            this.enemyLabel = enemyLabel;
+            this.lives = lives;
+            this.points = points;
+        }
+    
+        public JLabel getEnemyLabel() {
+            return enemyLabel;
+        }
+    
+        public int getLives() {
+            return lives;
+        }
+    
+        public void takeDamage(int damage) {
+            lives -= damage;
+        }
+    
+        public int getPoints() {
+            return points;
+        }
+    }
+
+    
+    
+    private void closeAndOpenInitial() {
+        // Detener todos los temporizadores y hilos
+        timer.stop();
+        gameTimer.stop();
+        itemTimer.stop();
+        enemigosThread.stopRunning(); // Modificado
+    
+        // Esperar a que el hilo de enemigos termine
+        try {
+            enemigosThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    
+        // Eliminar el JPanel del JFrame
+        mainFrame.getContentPane().remove(this);
+        mainFrame.revalidate();
+        mainFrame.repaint();
+    
+        // Abrir el JPanel inicial en el mismo JFrame
+        Inicial inicial = new Inicial();
+        
+    }
+    private void showEndGameDialog(String message) {
+        String playerName = JOptionPane.showInputDialog(panel, message + "\nIngresa tu nombre:", "Fin del juego", JOptionPane.INFORMATION_MESSAGE);
+        if (playerName != null && !playerName.trim().isEmpty()) {
+            ScoreManager scoreManager = new ScoreManager("scores.txt");
+            scoreManager.saveScore(playerName, player.getPoints());
+            
+        }
+        closeAndOpenInitial();
+    }
+    
+    
+    
+    
 }
 
 

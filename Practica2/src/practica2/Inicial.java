@@ -31,7 +31,7 @@ public class Inicial extends JFrame {
                     musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
                 Inicial.this.dispose();
                 JFrame gameFrame = new JFrame("Space Invaders");
-                Game gamePanel = new Game();
+                Game gamePanel = new Game(gameFrame);
                 gameFrame.add(gamePanel);
                 gameFrame.pack();
                 gameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -70,9 +70,9 @@ public class Inicial extends JFrame {
         score.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
-                System.out.println("Juego Iniciado");
-                dispose();
+                musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                musicPlayer.stopMusic();
+                showLeaderboard();
             }
         
         });
@@ -128,6 +128,12 @@ public class Inicial extends JFrame {
             frames.add(frame.getScaledInstance(width, height, Image.SCALE_DEFAULT));
         }
         return new ImageIcon(frames.get(0)).getImage();
+    }
+
+    private void showLeaderboard(){
+        ScoreManager scoreManager = new ScoreManager("scores.txt");
+        LeaderboardWindow leaderboardWindow = new LeaderboardWindow(scoreManager);
+        leaderboardWindow.setVisible(true);
     }
 
     

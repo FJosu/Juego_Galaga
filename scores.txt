@@ -1,0 +1,7 @@
+Josue: 0
+ Josue: 120
+Josue: 600
+  David: 140
+  Arcenio: 170
+Hans: 500
+Emanuel: 410
