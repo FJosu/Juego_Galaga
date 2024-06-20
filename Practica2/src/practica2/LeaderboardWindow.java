@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LeaderboardWindow extends JFrame {
-    private ScoreData scoreManager;
+    private ScoreData scoredata;
     private MusicPlayer musicPlayer;
 
     public LeaderboardWindow(ScoreData scoreManager) {
-        this.scoreManager = scoreManager;
+        this.scoredata = scoreManager;
 
         musicPlayer = new MusicPlayer();
         musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\song16.wav");

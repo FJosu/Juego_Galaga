@@ -296,16 +296,28 @@ public class Game extends JPanel implements ActionListener {
         JLabel explosionLabel = new JLabel(explosionIcon);
         explosionLabel.setBounds(x, y, explosionIcon.getIconWidth(), explosionIcon.getIconHeight());
         panel.add(explosionLabel, JLayeredPane.PALETTE_LAYER);
-
-        Timer explosionTimer = new Timer(500, new ActionListener() {
+    
+        // Crear un hilo para manejar la explosión
+        new Thread(new Runnable() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                panel.remove(explosionLabel);
-                panel.repaint();
+            public void run() {
+                try {
+                    // Esperar 500 milisegundos
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+    
+                // Ejecutar la eliminación de la explosión en el hilo de despacho de eventos de Swing
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        panel.remove(explosionLabel);
+                        panel.repaint();
+                    }
+                });
             }
-        });
-        explosionTimer.setRepeats(false);
-        explosionTimer.start();
+        }).start();
     }
 
     class Enemies extends Thread {
@@ -371,8 +383,8 @@ public class Game extends JPanel implements ActionListener {
                 enemyLabel.setLocation(enemyLabel.getX(), enemyLabel.getY() + dy);
                 if (enemyLabel.getY() >= panel.getHeight() - 65 || enemyLabel.getY() <= 0) {
                     dy = -dy;  
-                    for (Enemy en : enemies) {
-                        en.getEnemyLabel().setLocation(en.getEnemyLabel().getX() - 20, en.getEnemyLabel().getY()); 
+                    for (Enemy ene : enemies) {
+                        ene.getEnemyLabel().setLocation(ene.getEnemyLabel().getX() - 20, ene.getEnemyLabel().getY()); 
                     }
                     break;
                 }
@@ -462,45 +474,50 @@ public class Game extends JPanel implements ActionListener {
     }
 
     public void saveGameData() {
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Guardar datos del juego");
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        fileChooser.setSelectedFile(new File(String.format("%02d_%02d_%02d_%02d_%02d_%04d.bin",
+        // Carpeta donde se guardará el archivo
+        String folderPath = "C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\Games";
+        File folder = new File(folderPath);
+        
+        if (!folder.exists()) {
+            folder.mkdirs(); 
+        }
+    
+        String fileName = String.format("%02d_%02d_%02d_%02d_%02d_%04d.bin",
                 java.time.LocalDateTime.now().getHour(),
                 java.time.LocalDateTime.now().getMinute(),
                 java.time.LocalDateTime.now().getSecond(),
                 java.time.LocalDateTime.now().getDayOfMonth(),
                 java.time.LocalDateTime.now().getMonthValue(),
-                java.time.LocalDateTime.now().getYear())));
-        int result = fileChooser.showSaveDialog(null);
-    if (result == JFileChooser.APPROVE_OPTION) {
-        File file = fileChooser.getSelectedFile();
-
-        List<Enemy> enemies = enemigosThread.getEnemies();
-        int playerPoints = player.getPoints();
-        int remainingTime = timeRemaining22;
-
-        try (FileOutputStream fos = new FileOutputStream(file);
+                java.time.LocalDateTime.now().getYear());
+    
+        // Ruta completa del archivo
+        String filePath = folderPath + File.separator + fileName;
+    
+        try (FileOutputStream fos = new FileOutputStream(filePath);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-
+    
+            List<Enemy> enemies = enemigosThread.getEnemies();
+            int playerPoints = player.getPoints();
+            int remainingTime = timeRemaining22;
+    
             oos.writeInt(enemies.size());
             for (Enemy enemy : enemies) {
                 oos.writeInt(enemy.getEnemyLabel().getX());
                 oos.writeInt(enemy.getEnemyLabel().getY());
                 oos.writeInt(enemy.getLives());
             }
-
+    
             oos.writeInt(playerPoints);
             oos.writeInt(remainingTime);
-
-            JOptionPane.showMessageDialog(panel, "Datos del juego guardados exitosamente.");
+    
+            JOptionPane.showMessageDialog(panel, "Datos del juego guardados exitosamente en " + filePath);
             closeAndOpenInitial();
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(panel, "Error al guardar los datos del juego.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-}
+    
 
 private String getImagePathForColumn(int columnIndex) {
     switch (columnIndex) {
@@ -550,11 +567,11 @@ public void loadGameData() {
                 // Ajustar los puntos basados en la columna
                 int points;
                 if (column == 0) {
-                    points = 10;
+                    points = lives;
                 } else if (column == 1 || column == 2) {
-                    points = 20;
+                    points = lives;
                 } else if (column == 3 || column == 4) {
-                    points = 30;
+                    points = lives;
                 } else {
                     points = 0; 
                 }

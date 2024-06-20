@@ -2,18 +2,12 @@ package practica2;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class FileWindow extends JFrame {
-    private MusicPlayer musicPlayer;
     private MusicPlayer2 musicPlayer2;
     public FileWindow() {
 
@@ -29,7 +23,7 @@ public class FileWindow extends JFrame {
         //musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Sound.wav");
 
 
-        JButton Search = new JButton("New Game");
+        JButton Search = new JButton("Load Game");
         Search.setBounds(50, 100, 200, 50);
         Search.setContentAreaFilled(false);
         Search.setFocusPainted(false);
