@@ -538,9 +538,14 @@ public void loadGameData() {
                 int x = ois.readInt();
                 int y = ois.readInt();
                 int lives = ois.readInt();
-                JLabel enemyLabel = new JLabel(new ImageIcon(getClass().getResource(getImagePathForColumn(i % 5))));
+                // Determinar la columna basada en la posición x del enemigo
+                int column = (x - 600) / 62; // Asumiendo que 700 es el inicio de x y 62 es el espaciado horizontal como en createEnemies
+                String imagePath = getImagePathForColumn(column);
+                JLabel enemyLabel = new JLabel(new ImageIcon(getClass().getResource(imagePath)));
                 enemyLabel.setBounds(x, y, 60, 60);
-                loadedEnemies.add(new Enemy(enemyLabel, lives, 10 * (i % 5 + 1)));
+                // Ajustar los puntos basados en la columna
+                int points = 10 * ((column % 5) + 1);
+                loadedEnemies.add(new Enemy(enemyLabel, lives, points));
             }
             
 
