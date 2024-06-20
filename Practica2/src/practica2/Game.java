@@ -17,7 +17,7 @@ public class Game extends JPanel implements ActionListener {
     private Enemies enemigosThread;
     private ImageIcon backgroundImage;
     private MusicPlayer2 musicPlayer2;
-    private Timer gameTimer;
+
     private Timer itemTimer;
     private int timeRemaining;
     private JLabel timeLabel;
@@ -26,6 +26,8 @@ public class Game extends JPanel implements ActionListener {
     private final long shootCooldown = 500;
     private JFrame mainFrame;
     private MusicPlayer musicPlayer;
+    private volatile boolean timerunning = true;
+
 
     public Game(JFrame frame) {
         musicPlayer = new MusicPlayer();
@@ -79,24 +81,34 @@ public class Game extends JPanel implements ActionListener {
         panel.add(pointsLabel);
         pointsLabel.setBounds(600, 10, 300, 25);
 
-        gameTimer = new Timer(1000, new ActionListener() {
+        Thread gameTimerThread = new Thread(new Runnable() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                timeRemaining--;
-                timeLabel.setText("Time: " + timeRemaining + "s");
-                timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 25));
-                if (timeRemaining <= 0) {
-                    gameTimer.stop();
-                    timer.stop();
-                    enemigosThread.stopRunning();
-                    musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\GameOver.wav");
-                    showEndGameDialog("¡Game Over!");
-                    
+            public void run() {
+                while (timerunning && timeRemaining > 0) {
+                    try {
+                        Thread.sleep(1000);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                timeRemaining--;
+                                timeLabel.setText("Time: " + timeRemaining + "s");
+                                timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 25));
+                                if (timeRemaining == 0) {
+                                    timerunning = false; // Parar el hilo
+                                    enemigosThread.stopRunning();
+                                    musicPlayer2 = new MusicPlayer2();
+                                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\GameOver.wav");
+                                    showEndGameDialog("¡Game Over!");
+                                }
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
-        gameTimer.start();
+        gameTimerThread.start();
 
         itemTimer = new Timer(3000, new ActionListener() {
             @Override
@@ -221,7 +233,7 @@ public class Game extends JPanel implements ActionListener {
             JLabel enemyLabel = enemy.getEnemyLabel();
             if (playerBounds.intersects(enemyLabel.getBounds()) || enemyLabel.getX() <= 0) {
                 timer.stop();
-                gameTimer.stop();
+                stoptime();
                 enemigosThread.stopRunning();
                 musicPlayer2 = new MusicPlayer2();
                 musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\GameOver.wav");
@@ -236,7 +248,7 @@ public class Game extends JPanel implements ActionListener {
             musicPlayer2 = new MusicPlayer2();
             musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Victory.wav");
             timer.stop();
-            gameTimer.stop();
+            stoptime();
         }
     }
 
@@ -396,7 +408,7 @@ public class Game extends JPanel implements ActionListener {
     private void closeAndOpenInitial() {
         // Detener todos los temporizadores y hilos
         timer.stop();
-        gameTimer.stop();
+        stoptime();
         itemTimer.stop();
         enemigosThread.stopRunning(); // Modificado
 
@@ -423,5 +435,8 @@ public class Game extends JPanel implements ActionListener {
             scoreManager.saveScore(playerName, player.getPoints());
         }
         closeAndOpenInitial();
+    }
+    public void stoptime(){
+        timerunning = false;
     }
 }

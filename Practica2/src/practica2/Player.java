@@ -29,10 +29,10 @@ public class Player {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_UP) {
-            dy = -3;
+            dy = -2;
         }
         if (key == KeyEvent.VK_DOWN) {
-            dy = 3;
+            dy = 2;
         }
     }
 

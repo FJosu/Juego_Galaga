@@ -1,5 +1,7 @@
-Josue: 960
-Hand: 5
-jkl: 0
-jkljl: 23
-dsafasd: 23
+-: 0
+-: 0
+-: 0
+-: 0
+-: 0
+-: 0
+  David: 710
