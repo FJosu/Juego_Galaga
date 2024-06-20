@@ -4,7 +4,6 @@ package practica2;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.Position;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -16,13 +15,13 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.net.URL;
+
 
 public class Game extends JPanel implements ActionListener {
     private Timer timer;
     private Player player;
     private List<Bullet> bullets;
-    private List<Items> items; // Lista de ítems
+    private List<Items> items; 
     private JLayeredPane panel;
     private Enemies enemigosThread;
     private ImageIcon backgroundImage;
@@ -30,7 +29,7 @@ public class Game extends JPanel implements ActionListener {
     private Timer itemTimer;
     private int timeRemaining22;
     private JLabel timeLabel;
-    private JLabel pointsLabel; // Etiqueta para mostrar los puntos del jugador
+    private JLabel pointsLabel;
     private long lastShootTime = 0;
     private final long shootCooldown = 500;
     private JFrame mainFrame;
@@ -45,17 +44,15 @@ public class Game extends JPanel implements ActionListener {
         setFocusable(true);
         setPreferredSize(new Dimension(1000, 600));
 
-        // Cargar el GIF
         backgroundImage = new ImageIcon(getClass().getResource("/img/fondo.gif"));
 
-        player = new Player(50, 300); // Ajuste para posicionar al jugador correctamente
+        player = new Player(50, 300); 
 
         bullets = new ArrayList<>();
-        items = new ArrayList<>(); // Inicializar lista de ítems
+        items = new ArrayList<>(); 
         panel = new JLayeredPane();
         panel.setPreferredSize(new Dimension(1000, 600));
 
-        // Agregar el JLayeredPane al JFrame o contenedor principal
         add(panel);
 
         enemigosThread = new Enemies(panel);
@@ -163,7 +160,7 @@ public class Game extends JPanel implements ActionListener {
             }
         });
 
-        generateRandomItems();
+        
     }
 
     @Override
@@ -196,9 +193,9 @@ public class Game extends JPanel implements ActionListener {
     private void checkCollisions() {
         List<Bullet> bulletsToRemove = new ArrayList<>();
         List<Enemy> enemiesToRemove = new ArrayList<>();
-        List<Items> itemsToRemove = new ArrayList<>(); // Lista para ítems a eliminar
+        List<Items> itemsToRemove = new ArrayList<>(); 
 
-        Rectangle playerBounds = new Rectangle(player.getX(), player.getY(), 50, 50); // Rectángulo del jugador
+        Rectangle playerBounds = new Rectangle(player.getX(), player.getY(), 50, 50); 
 
         for (Bullet bullet : bullets) {
             Rectangle bulletBounds = bullet.getBounds();
@@ -207,13 +204,13 @@ public class Game extends JPanel implements ActionListener {
                 JLabel enemyLabel = enemy.getEnemyLabel();
                 if (bulletBounds.intersects(enemyLabel.getBounds())) {
                     bulletsToRemove.add(bullet);
-                    enemy.takeDamage(1); // Reducir la vida del enemigo
+                    enemy.takeDamage(1); 
                     if (enemy.getLives() <= 0) {
                         enemiesToRemove.add(enemy);
                         showExplosion(enemyLabel.getX(), enemyLabel.getY());
                         panel.remove(enemyLabel);
-                        player.addPoints(enemy.getPoints()); // Añadir puntos al jugador
-                        updatePointsLabel(); // Actualizar la etiqueta de puntos
+                        player.addPoints(enemy.getPoints()); 
+                        updatePointsLabel(); 
                         System.out.println("Enemy destroyed!");
                         musicPlayer2 = new MusicPlayer2();
                         musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\explosion.wav");
@@ -229,15 +226,15 @@ public class Game extends JPanel implements ActionListener {
                 itemsToRemove.add(item);
                 panel.remove(item.getItemLabel());
                 if (item.getType().equals("points")) {
-                    player.addPoints(10); // Añadir puntos al jugador
+                    player.addPoints(10); 
                 } else if (item.getType().equals("penalization")) {
-                    addTime(10); // Añadir 5 segundos al temporizador del juego
+                    addTime(10); 
                 } else if (item.getType().equals("-points")) {
                     player.addPoints(-10);
                 } else if (item.getType().equals("-time")) {
                     addTime(-10);
                 }
-                updatePointsLabel(); // Actualizar la etiqueta de puntos
+                updatePointsLabel();
             }
         }
 
@@ -254,9 +251,8 @@ public class Game extends JPanel implements ActionListener {
                 enemigosThread.stopRunning();
                 musicPlayer2 = new MusicPlayer2();
                 musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\GameOver.wav");
-                // Mostrar mensaje de "Game Over"
                 showEndGameDialog("¡Game Over!");
-                return; // Salir del método después de detectar el Game Over
+                return; 
             }
         }
 
@@ -277,7 +273,7 @@ public class Game extends JPanel implements ActionListener {
         } else {
             type = rand.nextBoolean() ? "penalization" : rand.nextBoolean() ? "-points" : "-time";
         }
-        int x = 800; // Los ítems comenzarán en la posición x = 0
+        int x = 1000; 
         int y = rand.nextInt(550);
         Items item = new Items(type, x, y);
         items.add(item);
@@ -316,8 +312,8 @@ public class Game extends JPanel implements ActionListener {
         Position enemyPosition;
         private ArrayList<Enemy> enemies;
         private JLayeredPane panel;
-        private int dy = 2;  // Velocidad vertical
-        private boolean running = true; // Añadido
+        private int dy = 5;  
+        private boolean running = true;
 
         public void setEnemies(List<Enemy> newEnemies) {
             this.enemies = new ArrayList<>(newEnemies);
@@ -332,8 +328,8 @@ public class Game extends JPanel implements ActionListener {
         }
 
         private void createEnemies() {
-            int horizontalSpacing = 62; // Ajusta este valor para aumentar el espacio horizontal
-            int verticalSpacing = 60;   // Ajusta este valor para aumentar el espacio vertical
+            int horizontalSpacing = 62; 
+            int verticalSpacing = 60;   
             int life;
             int points;
 
@@ -354,11 +350,11 @@ public class Game extends JPanel implements ActionListener {
                         points = 30;
                     }
 
-                    Image enemyImage = enemigoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH); // Aumentar tamaño de los enemigos
+                    Image enemyImage = enemigoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH); 
                     enemigoIcon = new ImageIcon(enemyImage);
 
                     JLabel enemyLabel = new JLabel(enemigoIcon);
-                    enemyLabel.setBounds(700 + j * horizontalSpacing, 50 + i * verticalSpacing, 40, 40); // Ajustar la posición y tamaño de los enemigos
+                    enemyLabel.setBounds(700 + j * horizontalSpacing, 50 + i * verticalSpacing, 40, 40); 
 
                     enemies.add(new Enemy(enemyLabel, life, points));
                 }
@@ -374,28 +370,28 @@ public class Game extends JPanel implements ActionListener {
                 JLabel enemyLabel = enemy.getEnemyLabel();
                 enemyLabel.setLocation(enemyLabel.getX(), enemyLabel.getY() + dy);
                 if (enemyLabel.getY() >= panel.getHeight() - 65 || enemyLabel.getY() <= 0) {
-                    dy = -dy;  // Cambiar de dirección
+                    dy = -dy;  
                     for (Enemy en : enemies) {
-                        en.getEnemyLabel().setLocation(en.getEnemyLabel().getX() - 20, en.getEnemyLabel().getY());  // Mover los enemigos a la izquierda
+                        en.getEnemyLabel().setLocation(en.getEnemyLabel().getX() - 20, en.getEnemyLabel().getY()); 
                     }
                     break;
                 }
             }
         }
 
-        public void stopRunning() { // Añadido
+        public void stopRunning() { 
             running = false;
         }
 
         @Override
         public void run() {
-            while (running) { // Cambiado
+            while (running) { 
                 moveEnemies();
                 panel.repaint();
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    running = false; // Añadido: salir del ciclo cuando se interrumpe el sueño
+                    running = false; 
                 }
             }
         }
@@ -430,13 +426,12 @@ public class Game extends JPanel implements ActionListener {
     }
 
     private void closeAndOpenInitial() {
-        // Detener todos los temporizadores y hilos
+        // Detener todos los temporizadores e hilos
         timer.stop();
         stoptime();
         itemTimer.stop();
-        enemigosThread.stopRunning(); // Modificado
+        enemigosThread.stopRunning();
 
-        // Esperar a que el hilo de enemigos termine
         try {
             enemigosThread.join();
         } catch (InterruptedException e) {
@@ -447,15 +442,15 @@ public class Game extends JPanel implements ActionListener {
         mainFrame.getContentPane().remove(this);
         mainFrame.revalidate();
         mainFrame.repaint();
+        mainFrame.dispose();
 
-        // Abrir el JPanel inicial en el mismo JFrame
         Inicial inicial = new Inicial();
     }
 
     private void showEndGameDialog(String message) {
         String playerName = JOptionPane.showInputDialog(panel, message + "\nIngresa tu nombre:", "Fin del juego", JOptionPane.INFORMATION_MESSAGE);
         if (playerName != null && !playerName.trim().isEmpty()) {
-            ScoreManager scoreManager = new ScoreManager("scores.txt");
+            ScoreData scoreManager = new ScoreData("scores.txt");
             scoreManager.saveScore(playerName, player.getPoints());
         }
         closeAndOpenInitial();
@@ -467,22 +462,23 @@ public class Game extends JPanel implements ActionListener {
     public void saveGameData() {
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Guardar datos del juego");
-
-    int userSelection = fileChooser.showSaveDialog(panel);
-    if (userSelection == JFileChooser.APPROVE_OPTION) {
-        File fileToSave = fileChooser.getSelectedFile();
-        String filePath = fileToSave.getAbsolutePath();
-
-        // Añadir la extensión .bin si no está presente
-        if (!filePath.toLowerCase().endsWith(".bin")) {
-            filePath += ".bin";
-        }
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fileChooser.setSelectedFile(new File(String.format("%02d_%02d_%02d_%02d_%02d_%04d.bin",
+                java.time.LocalDateTime.now().getHour(),
+                java.time.LocalDateTime.now().getMinute(),
+                java.time.LocalDateTime.now().getSecond(),
+                java.time.LocalDateTime.now().getDayOfMonth(),
+                java.time.LocalDateTime.now().getMonthValue(),
+                java.time.LocalDateTime.now().getYear())));
+        int result = fileChooser.showSaveDialog(null);
+    if (result == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
 
         List<Enemy> enemies = enemigosThread.getEnemies();
         int playerPoints = player.getPoints();
         int remainingTime = timeRemaining22;
 
-        try (FileOutputStream fos = new FileOutputStream(filePath);
+        try (FileOutputStream fos = new FileOutputStream(file);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             oos.writeInt(enemies.size());
@@ -496,12 +492,14 @@ public class Game extends JPanel implements ActionListener {
             oos.writeInt(remainingTime);
 
             JOptionPane.showMessageDialog(panel, "Datos del juego guardados exitosamente.");
+            closeAndOpenInitial();
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(panel, "Error al guardar los datos del juego.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
+
 private String getImagePathForColumn(int columnIndex) {
     switch (columnIndex) {
         case 0:
@@ -513,7 +511,7 @@ private String getImagePathForColumn(int columnIndex) {
         case 4:
             return "/img/row45.png";
         default:
-            return ""; // Si no se encuentra ninguna imagen adecuada
+            return ""; 
     }
 }
 
@@ -538,20 +536,33 @@ public void loadGameData() {
                 int x = ois.readInt();
                 int y = ois.readInt();
                 int lives = ois.readInt();
-                // Determinar la columna basada en la posición x del enemigo
-                int column = (x - 600) / 62; // Asumiendo que 700 es el inicio de x y 62 es el espaciado horizontal como en createEnemies
+                int column = (x - 600) / 62; 
                 String imagePath = getImagePathForColumn(column);
-                JLabel enemyLabel = new JLabel(new ImageIcon(getClass().getResource(imagePath)));
-                enemyLabel.setBounds(x, y, 60, 60);
+                ImageIcon originalIcon = new ImageIcon(getClass().getResource(imagePath));
+                Image originalImage = originalIcon.getImage();
+    
+                Image resizedImage = originalImage.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                ImageIcon resizedIcon = new ImageIcon(resizedImage);
+                JLabel enemyLabel = new JLabel(resizedIcon);
+                enemyLabel.setBounds(x, y, 40, 40);
                 // Ajustar los puntos basados en la columna
-                int points = 10 * ((column % 5) + 1);
+                int points;
+                if (column == 0) {
+                    points = 10;
+                } else if (column == 1 || column == 2) {
+                    points = 20;
+                } else if (column == 3 || column == 4) {
+                    points = 30;
+                } else {
+                    points = 0; 
+                }
                 loadedEnemies.add(new Enemy(enemyLabel, lives, points));
             }
             
 
             int playerPoints = ois.readInt();
             int remainingTime = ois.readInt();
-            enemigosThread.stopRunning(); // Detener el hilo actual de enemigos
+            enemigosThread.stopRunning(); 
             for (Enemy enemy : enemigosThread.getEnemies()) {
                 panel.remove(enemy.getEnemyLabel());
             }
@@ -562,26 +573,27 @@ public void loadGameData() {
             panel.repaint();
 
             // Actualizar la lista de enemigos en el juego
-            
-            enemigosThread = new Enemies(panel); // Crear un nuevo hilo de enemigos con la lista cargada
-            enemigosThread.setEnemies(loadedEnemies); // Establecer la lista de enemigos cargada
-            enemigosThread.start(); // Iniciar el nuevo hilo de enemigos
-
-            // Limpiar y repintar el panel para reflejar los cambios
-            
-
+            enemigosThread = new Enemies(panel); 
+            enemigosThread.setEnemies(loadedEnemies); 
             player.setPoints(playerPoints);
-            timeRemaining22 = remainingTime;
+            timeRemaining22 = remainingTime+3;
 
             updatePointsLabel();
             timeLabel.setText("Time: " + timeRemaining22 + "s");
-
+            
             JOptionPane.showMessageDialog(panel, "Datos del juego cargados exitosamente.");
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(panel, "Error al cargar los datos del juego.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+}
+public void Startgame(){
+    
+    timer.start();
+    itemTimer.start();
+    enemigosThread.start(); 
+    
 }
     
 }

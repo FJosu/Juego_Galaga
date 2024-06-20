@@ -7,9 +7,9 @@ import java.awt.event.*;
 public class Player {
     private int x, y;
     private int dy;
-    private Image playerImage; // Imagen del jugador
-    private int width = 50; // Ancho del jugador
-    private int height = 50; // Alto del jugador
+    private Image playerImage; 
+    private int width = 50; 
+    private int height = 50; 
     private int points;
 
     public Player(int initialX, int initialY) {
@@ -18,7 +18,7 @@ public class Player {
         points = 0; // Inicializar puntos a 0
         
         // Cargar la imagen del jugador y escalarla al tamaño deseado
-        ImageIcon playerIcon = new ImageIcon(getClass().getResource("/img/player.png")); // Ajusta la ruta según donde tengas la imagen
+        ImageIcon playerIcon = new ImageIcon(getClass().getResource("/img/player.png")); 
         playerImage = playerIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 

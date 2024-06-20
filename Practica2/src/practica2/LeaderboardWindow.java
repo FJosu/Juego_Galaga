@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LeaderboardWindow extends JFrame {
-    private ScoreManager scoreManager;
+    private ScoreData scoreManager;
     private MusicPlayer musicPlayer;
 
-    public LeaderboardWindow(ScoreManager scoreManager) {
+    public LeaderboardWindow(ScoreData scoreManager) {
         this.scoreManager = scoreManager;
 
         musicPlayer = new MusicPlayer();
@@ -29,32 +29,32 @@ public class LeaderboardWindow extends JFrame {
         JLabel firstPlaceLabel = new JLabel(formatScore(topScores.get(0)));
         firstPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
         firstPlaceLabel.setForeground(Color.WHITE);
-        firstPlaceLabel.setBounds(165, 360, 200, 50); // Ajusta las coordenadas según sea necesario
+        firstPlaceLabel.setBounds(165, 360, 200, 50); 
         add(firstPlaceLabel);
 
         JLabel secondPlaceLabel = new JLabel(formatScore(topScores.get(1)));
         secondPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
         secondPlaceLabel.setForeground(Color.WHITE);
-        secondPlaceLabel.setBounds(10, 390, 200, 50); // Ajusta las coordenadas según sea necesario
+        secondPlaceLabel.setBounds(10, 390, 200, 50); 
         add(secondPlaceLabel);
 
         JLabel thirdPlaceLabel = new JLabel(formatScore(topScores.get(2)));
         thirdPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
         thirdPlaceLabel.setForeground(Color.WHITE);
-        thirdPlaceLabel.setBounds(260, 400, 200, 50); // Ajusta las coordenadas según sea necesario
+        thirdPlaceLabel.setBounds(260, 400, 200, 50);
         add(thirdPlaceLabel);
 
         // Agregar los lugares 4 y 5 abajo del podio
         JLabel fourthPlaceLabel = new JLabel("4. "+formatScore(topScores.get(3)));
         fourthPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
         fourthPlaceLabel.setForeground(Color.WHITE);
-        fourthPlaceLabel.setBounds(50, 525, 400, 50); // Ajusta las coordenadas según sea necesario
+        fourthPlaceLabel.setBounds(50, 525, 400, 50); 
         add(fourthPlaceLabel);
 
         JLabel fifthPlaceLabel = new JLabel("5. "+formatScore(topScores.get(4)));
         fifthPlaceLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 18));
         fifthPlaceLabel.setForeground(Color.WHITE);
-        fifthPlaceLabel.setBounds(50, 550, 400, 50); // Ajusta las coordenadas según sea necesario
+        fifthPlaceLabel.setBounds(50, 550, 400, 50); 
         add(fifthPlaceLabel);
 
          // Cargar la imagen del podio
@@ -93,14 +93,8 @@ public class LeaderboardWindow extends JFrame {
         // Cargar y redimensionar el GIF
         ImageIcon gif = new ImageIcon(getClass().getResource("/img/space.gif"));
         ImageIcon scaledGif = new ImageIcon(scaleGif(gif, getWidth(), getHeight()));
-
-        // Crear un JLabel con el GIF redimensionado
         JLabel gifLabel = new JLabel(scaledGif);
-
-        // Añadir el JLabel al JFrame
         add(gifLabel, BorderLayout.CENTER);
-
-        // Hacer visible la ventana
         setVisible(true);
     }
 

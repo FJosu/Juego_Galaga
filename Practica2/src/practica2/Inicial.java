@@ -13,8 +13,8 @@ public class Inicial extends JFrame {
     private MusicPlayer2 musicPlayer2;
     public Inicial() {
 
-        //musicPlayer = new MusicPlayer();
-        //musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Sound.wav");
+        musicPlayer = new MusicPlayer();
+        musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Sound.wav");
 
 
         JButton newgame = new JButton("New Game");
@@ -54,17 +54,11 @@ public class Inicial extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
                     musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
-                    JFrame frame = new JFrame("Mi Juego");
-              Game game = new Game(frame);
+                Inicial.this.dispose();
 
-                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-               frame.add(game);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-
-        // Llamar al método loadGameData en la instancia de Game
-                game.loadGameData();
+                SwingUtilities.invokeLater(() -> {
+            new FileWindow().setVisible(true);
+        });
             }
         });
         add(load);
@@ -140,7 +134,7 @@ public class Inicial extends JFrame {
     }
 
     private void showLeaderboard(){
-        ScoreManager scoreManager = new ScoreManager("scores.txt");
+        ScoreData scoreManager = new ScoreData("scores.txt");
         LeaderboardWindow leaderboardWindow = new LeaderboardWindow(scoreManager);
         leaderboardWindow.setVisible(true);
     }
