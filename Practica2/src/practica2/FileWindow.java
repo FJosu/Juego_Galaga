@@ -58,6 +58,7 @@ public class FileWindow extends JFrame {
         load.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 20));
         load.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                FileWindow.this.dispose();
                 musicPlayer2 = new MusicPlayer2();
                     musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
                     

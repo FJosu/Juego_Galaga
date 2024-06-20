@@ -312,7 +312,7 @@ public class Game extends JPanel implements ActionListener {
         Position enemyPosition;
         private ArrayList<Enemy> enemies;
         private JLayeredPane panel;
-        private int dy = 5;  
+        private int dy = 2;  
         private boolean running = true;
 
         public void setEnemies(List<Enemy> newEnemies) {
@@ -448,7 +448,9 @@ public class Game extends JPanel implements ActionListener {
     }
 
     private void showEndGameDialog(String message) {
-        String playerName = JOptionPane.showInputDialog(panel, message + "\nIngresa tu nombre:", "Fin del juego", JOptionPane.INFORMATION_MESSAGE);
+        int tempscore = player.getPoints();
+        String playerName = JOptionPane.showInputDialog(panel, message + "\nIngresa tu nombre: \n" + //
+                        "Tu Score es de :"+tempscore, "Fin del juego", JOptionPane.INFORMATION_MESSAGE);
         if (playerName != null && !playerName.trim().isEmpty()) {
             ScoreData scoreManager = new ScoreData("scores.txt");
             scoreManager.saveScore(playerName, player.getPoints());

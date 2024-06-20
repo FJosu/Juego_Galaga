@@ -54,6 +54,7 @@ public class Inicial extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
                     musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                    musicPlayer.stopMusic();
                 Inicial.this.dispose();
 
                 SwingUtilities.invokeLater(() -> {
