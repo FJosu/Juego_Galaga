@@ -67,5 +67,8 @@ public class Player {
         // Dibujar la imagen del jugador
         g.drawImage(playerImage, x, y, width, height, null);
     }
+    public void setPoints(int points) {
+        this.points = points;
+    }
 }
 

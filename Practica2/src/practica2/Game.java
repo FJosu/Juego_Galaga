@@ -2,11 +2,21 @@ package practica2;
 
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.Position;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.net.URL;
 
 public class Game extends JPanel implements ActionListener {
     private Timer timer;
@@ -17,9 +27,8 @@ public class Game extends JPanel implements ActionListener {
     private Enemies enemigosThread;
     private ImageIcon backgroundImage;
     private MusicPlayer2 musicPlayer2;
-
     private Timer itemTimer;
-    private int timeRemaining;
+    private int timeRemaining22;
     private JLabel timeLabel;
     private JLabel pointsLabel; // Etiqueta para mostrar los puntos del jugador
     private long lastShootTime = 0;
@@ -28,7 +37,7 @@ public class Game extends JPanel implements ActionListener {
     private MusicPlayer musicPlayer;
     private volatile boolean timerunning = true;
 
-
+    
     public Game(JFrame frame) {
         musicPlayer = new MusicPlayer();
         musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\song04.wav");
@@ -60,8 +69,8 @@ public class Game extends JPanel implements ActionListener {
         timer.start();
 
         // Inicializar el temporizador del juego con 90 segundos
-        timeRemaining = 90;
-        timeLabel = new JLabel("Time: " + timeRemaining + "s");
+        timeRemaining22 = 90;
+        timeLabel = new JLabel("Time: " + timeRemaining22 + "s");
         timeLabel.setForeground(Color.WHITE);
         timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 30));
         timeLabel.setBounds(70, 10, 200, 30);
@@ -84,16 +93,16 @@ public class Game extends JPanel implements ActionListener {
         Thread gameTimerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (timerunning && timeRemaining > 0) {
+                while (timerunning && timeRemaining22 > 0) {
                     try {
                         Thread.sleep(1000);
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                timeRemaining--;
-                                timeLabel.setText("Time: " + timeRemaining + "s");
+                                timeRemaining22--;
+                                timeLabel.setText("Time: " + timeRemaining22 + "s");
                                 timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 25));
-                                if (timeRemaining == 0) {
+                                if (timeRemaining22 == 0) {
                                     timerunning = false; // Parar el hilo
                                     enemigosThread.stopRunning();
                                     musicPlayer2 = new MusicPlayer2();
@@ -137,6 +146,14 @@ public class Game extends JPanel implements ActionListener {
                     if (response == JOptionPane.YES_OPTION) {
                         closeAndOpenInitial();
                     }
+                }
+                if(e.getKeyCode()== KeyEvent.VK_S){
+                    timer.stop();
+                stoptime();
+                enemigosThread.stopRunning();
+
+                    saveGameData();
+
                 }
             }
 
@@ -268,8 +285,8 @@ public class Game extends JPanel implements ActionListener {
     }
 
     private void addTime(int seconds) {
-        timeRemaining += seconds;
-        timeLabel.setText("Time: " + timeRemaining + "s");
+        timeRemaining22 += seconds;
+        timeLabel.setText("Time: " + timeRemaining22 + "s");
         timeLabel.setFont(new Font("LXGW WenKai Mono TC", Font.BOLD, 30));
     }
 
@@ -296,10 +313,17 @@ public class Game extends JPanel implements ActionListener {
     }
 
     class Enemies extends Thread {
+        Position enemyPosition;
         private ArrayList<Enemy> enemies;
         private JLayeredPane panel;
         private int dy = 2;  // Velocidad vertical
         private boolean running = true; // Añadido
+
+        public void setEnemies(List<Enemy> newEnemies) {
+            this.enemies = new ArrayList<>(newEnemies);
+            for (Enemy enemy : newEnemies) {
+                panel.add(enemy.getEnemyLabel());
+            }}
 
         public Enemies(JLayeredPane panel) {
             this.panel = panel;
@@ -439,4 +463,120 @@ public class Game extends JPanel implements ActionListener {
     public void stoptime(){
         timerunning = false;
     }
+
+    public void saveGameData() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Guardar datos del juego");
+
+    int userSelection = fileChooser.showSaveDialog(panel);
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        File fileToSave = fileChooser.getSelectedFile();
+        String filePath = fileToSave.getAbsolutePath();
+
+        // Añadir la extensión .bin si no está presente
+        if (!filePath.toLowerCase().endsWith(".bin")) {
+            filePath += ".bin";
+        }
+
+        List<Enemy> enemies = enemigosThread.getEnemies();
+        int playerPoints = player.getPoints();
+        int remainingTime = timeRemaining22;
+
+        try (FileOutputStream fos = new FileOutputStream(filePath);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
+            oos.writeInt(enemies.size());
+            for (Enemy enemy : enemies) {
+                oos.writeInt(enemy.getEnemyLabel().getX());
+                oos.writeInt(enemy.getEnemyLabel().getY());
+                oos.writeInt(enemy.getLives());
+            }
+
+            oos.writeInt(playerPoints);
+            oos.writeInt(remainingTime);
+
+            JOptionPane.showMessageDialog(panel, "Datos del juego guardados exitosamente.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(panel, "Error al guardar los datos del juego.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+private String getImagePathForColumn(int columnIndex) {
+    switch (columnIndex) {
+        case 0:
+            return "/img/row1.png";
+        case 1:
+        case 2:
+            return "/img/row34.png";
+        case 3:
+        case 4:
+            return "/img/row45.png";
+        default:
+            return ""; // Si no se encuentra ninguna imagen adecuada
+    }
+}
+
+public void loadGameData() {
+    JFileChooser fileChooser = new JFileChooser();
+    FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivo Bin", "bin");
+    fileChooser.setFileFilter(filter);
+    fileChooser.setDialogTitle("Cargar datos del juego");
+
+    int userSelection = fileChooser.showOpenDialog(panel);
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        File fileToLoad = fileChooser.getSelectedFile();
+        String filePath = fileToLoad.getAbsolutePath();
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+            int numberOfEnemies = ois.readInt();
+            List<Enemy> loadedEnemies = new ArrayList<>();
+
+            for (int i = 0; i < numberOfEnemies; i++) {
+                int x = ois.readInt();
+                int y = ois.readInt();
+                int lives = ois.readInt();
+                JLabel enemyLabel = new JLabel(new ImageIcon(getClass().getResource(getImagePathForColumn(i % 5))));
+                enemyLabel.setBounds(x, y, 60, 60);
+                loadedEnemies.add(new Enemy(enemyLabel, lives, 10 * (i % 5 + 1)));
+            }
+            
+
+            int playerPoints = ois.readInt();
+            int remainingTime = ois.readInt();
+            enemigosThread.stopRunning(); // Detener el hilo actual de enemigos
+            for (Enemy enemy : enemigosThread.getEnemies()) {
+                panel.remove(enemy.getEnemyLabel());
+            }
+    
+            // Limpiar la lista de enemigos
+            enemigosThread.getEnemies().clear();
+            panel.revalidate();
+            panel.repaint();
+
+            // Actualizar la lista de enemigos en el juego
+            
+            enemigosThread = new Enemies(panel); // Crear un nuevo hilo de enemigos con la lista cargada
+            enemigosThread.setEnemies(loadedEnemies); // Establecer la lista de enemigos cargada
+            enemigosThread.start(); // Iniciar el nuevo hilo de enemigos
+
+            // Limpiar y repintar el panel para reflejar los cambios
+            
+
+            player.setPoints(playerPoints);
+            timeRemaining22 = remainingTime;
+
+            updatePointsLabel();
+            timeLabel.setText("Time: " + timeRemaining22 + "s");
+
+            JOptionPane.showMessageDialog(panel, "Datos del juego cargados exitosamente.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(panel, "Error al cargar los datos del juego.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+    
 }

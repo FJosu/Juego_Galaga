@@ -13,8 +13,8 @@ public class Inicial extends JFrame {
     private MusicPlayer2 musicPlayer2;
     public Inicial() {
 
-        musicPlayer = new MusicPlayer();
-        musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Sound.wav");
+        //musicPlayer = new MusicPlayer();
+        //musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Sound.wav");
 
 
         JButton newgame = new JButton("New Game");
@@ -54,10 +54,18 @@ public class Inicial extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
                     musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
-                System.out.println("Juego Iniciado");
-                dispose();
+                    JFrame frame = new JFrame("Mi Juego");
+              Game game = new Game(frame);
+
+                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+               frame.add(game);
+                frame.pack();
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+
+        // Llamar al método loadGameData en la instancia de Game
+                game.loadGameData();
             }
-        
         });
         add(load);
         JButton score = new JButton("Scores");
