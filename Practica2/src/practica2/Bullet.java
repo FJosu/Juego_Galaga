@@ -2,7 +2,6 @@ package practica2;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class Bullet {
     private int x, y;

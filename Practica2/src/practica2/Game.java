@@ -39,7 +39,7 @@ public class Game extends JPanel implements ActionListener {
     
     public Game(JFrame frame) {
         musicPlayer = new MusicPlayer();
-        musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\song04.wav");
+        musicPlayer.playMusic("Practica2/src/img/song04.wav");
         this.mainFrame = frame;
         setFocusable(true);
         setPreferredSize(new Dimension(1000, 600));
@@ -103,7 +103,7 @@ public class Game extends JPanel implements ActionListener {
                                     timerunning = false; // Parar el hilo
                                     enemigosThread.stopRunning();
                                     musicPlayer2 = new MusicPlayer2();
-                                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\GameOver.wav");
+                                    musicPlayer2.playMusic("Practica2/src/img/GameOver.wav");
                                     showEndGameDialog("¡Game Over!");
                                 }
                             }
@@ -133,7 +133,7 @@ public class Game extends JPanel implements ActionListener {
                     if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                         bullets.add(new Bullet(player.getX() + 20, player.getY() + 7));
                         musicPlayer2 = new MusicPlayer2();
-                        musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                        musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
                         lastShootTime = currentTime;
                     }
                 }
@@ -213,7 +213,7 @@ public class Game extends JPanel implements ActionListener {
                         updatePointsLabel(); 
                         System.out.println("Enemy destroyed!");
                         musicPlayer2 = new MusicPlayer2();
-                        musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\explosion.wav");
+                        musicPlayer2.playMusic("Practica2/src/img/explosion.wav");
                     }
                     break;
                 }
@@ -250,7 +250,7 @@ public class Game extends JPanel implements ActionListener {
                 stoptime();
                 enemigosThread.stopRunning();
                 musicPlayer2 = new MusicPlayer2();
-                musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\GameOver.wav");
+                musicPlayer2.playMusic("Practica2/src/img/GameOver.wav");
                 showEndGameDialog("¡Game Over!");
                 return; 
             }
@@ -259,7 +259,7 @@ public class Game extends JPanel implements ActionListener {
         if (enemigosThread.getEnemies().isEmpty()) {
             showEndGameDialog("¡Has ganado!");
             musicPlayer2 = new MusicPlayer2();
-            musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Victory.wav");
+            musicPlayer2.playMusic("Practica2/src/img/Victory.wav");
             timer.stop();
             stoptime();
         }

@@ -2,7 +2,6 @@ package practica2;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionListener;
@@ -14,7 +13,7 @@ public class Inicial extends JFrame {
     public Inicial() {
 
         musicPlayer = new MusicPlayer();
-        musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Sound.wav");
+        musicPlayer.playMusic("Practica2/src/img/Sound.wav");
 
 
         JButton newgame = new JButton("New Game");
@@ -28,7 +27,7 @@ public class Inicial extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                    musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
                 Inicial.this.dispose();
                 JFrame gameFrame = new JFrame("Space Invaders");
                 Game gamePanel = new Game(gameFrame);
@@ -53,7 +52,7 @@ public class Inicial extends JFrame {
         load.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                    musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
                     musicPlayer.stopMusic();
                 Inicial.this.dispose();
 
@@ -73,7 +72,7 @@ public class Inicial extends JFrame {
         score.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
-                musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
                 musicPlayer.stopMusic();
                 showLeaderboard();
                 dispose();
@@ -93,7 +92,7 @@ public class Inicial extends JFrame {
                
                 dispose();
                 musicPlayer2 = new MusicPlayer2();
-                musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
             }
         
         });

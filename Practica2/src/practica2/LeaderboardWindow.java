@@ -12,7 +12,7 @@ public class LeaderboardWindow extends JFrame {
         this.scoredata = scoreManager;
 
         musicPlayer = new MusicPlayer();
-        musicPlayer.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\song16.wav");
+        musicPlayer.playMusic("Practica2/src/img/song16.wav");
        
         ImageIcon Top5 = new ImageIcon(getClass().getResource("/img/TOP5.png"));
         Image top5dime = Top5.getImage().getScaledInstance(600, 300,Image.SCALE_SMOOTH);

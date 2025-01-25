@@ -34,7 +34,7 @@ public class FileWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                    musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
                     
 
                 game.loadGameData();
@@ -54,7 +54,7 @@ public class FileWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 FileWindow.this.dispose();
                 musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                    musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
                     
                 frame.setVisible(true);
                 game.Startgame();
@@ -72,7 +72,7 @@ public class FileWindow extends JFrame {
         back.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 musicPlayer2 = new MusicPlayer2();
-                    musicPlayer2.playMusic("C:\\Users\\Josue\\OneDrive\\Escritorio\\-IPC1-A-Practica2_202307378\\Practica2\\src\\img\\Shoot.wav");
+                    musicPlayer2.playMusic("Practica2/src/img/Shoot.wav");
                     FileWindow.this.dispose();
                     Inicial inicial = new Inicial();
             }
